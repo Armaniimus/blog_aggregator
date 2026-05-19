@@ -1,6 +1,6 @@
 import { setUser } from "../config";
 import { GuidedExit } from "../index.js";
-import { createUser, selectUser} from "../lib/db/queries/user.js";
+import { createUser, selectUser, deleteAllUsers} from "../lib/db/queries/user.js";
 
 export type CommandHandler = (cmdName: string, ...args: string[]) => Promise<void>;
 
@@ -31,4 +31,12 @@ export const handlerRegister: CommandHandler = async (cmdName: string, ...args: 
 	const user = await createUser(username)
 	setUser(username)
 	console.log("success: user created",user)
+}
+
+export const handlerReset: CommandHandler = async (cmdName: string, ...args: string[]) => {
+	try {
+		await deleteAllUsers()
+	} catch(err) {
+		throw new GuidedExit("error: reset failed");
+	}
 }

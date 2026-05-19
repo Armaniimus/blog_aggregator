@@ -8,8 +8,6 @@ const config = readConfig();
 const conn = postgres(config.dbUrl);
 export const db = drizzle(conn, { schema });
 
-console.log(config)
-
 export const closeDb = (): Promise<void> => {
 	return conn.end();
 }

@@ -14,3 +14,7 @@ export async function selectUser(name: string) {
 		.where(eq(users.name, name))
 	return result;
 }
+
+export async function deleteAllUsers() {
+	return await db.delete(users);
+}
