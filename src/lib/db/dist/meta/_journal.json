@@ -8,6 +8,13 @@
       "when": 1779138188186,
       "tag": "0000_abnormal_paper_doll",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1779233175711,
+      "tag": "0001_wooden_terrax",
+      "breakpoints": true
     }
   ]
 }

@@ -1,4 +1,4 @@
-import { CommandHandler, handlerLogin, handlerRegister, handlerReset } from "./handlers";
+import { CommandHandler, handlerLogin, handlerRegister, handlerReset, handlerUsers, handleAggregator, handleAddFeed, handleFeeds } from "./handlers";
 
 type CommandsRegistry = Record<string, CommandHandler>
 
@@ -7,6 +7,10 @@ export const initCommands = (): CommandsRegistry => {
 	registerCommand(commandRegistery, "login", handlerLogin);
 	registerCommand(commandRegistery, "register", handlerRegister);
 	registerCommand(commandRegistery, "reset", handlerReset);
+	registerCommand(commandRegistery, "users", handlerUsers);
+	registerCommand(commandRegistery, "agg", handleAggregator);
+	registerCommand(commandRegistery, "addfeed", handleAddFeed);
+	registerCommand(commandRegistery, "feeds", handleFeeds);
 	return commandRegistery;
 }
 
