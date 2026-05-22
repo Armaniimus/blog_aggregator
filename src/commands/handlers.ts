@@ -3,7 +3,7 @@ import { GuidedExit } from "../index.js";
 import { createUser, selectUser, deleteAllUsers, selectAllUsers} from "../lib/db/queries/user.js";
 import { fetchFeed } from "../../rss.js"; 
 import { insertFeed, selectAllFeeds, getFeedByUrl } from "../lib/db/queries/feed.js";
-import { selectFullFeedFollow, insertFeedFollows, selectAllFullFeedFollows } from "../lib/db/queries/feed_follows.js";
+import { selectFullFeedFollow, insertFeedFollows, selectAllFullFeedFollows, deleteFeedFollow } from "../lib/db/queries/feed_follows.js";
 import { Feed, FeedMini, feeds, User, FullFeedFollow, FeedFollows } from "../lib/db/schema.js";
 
 export type CommandHandler = (cmdName: string, ...args: string[]) => Promise<void>;
@@ -103,4 +103,19 @@ export const handleFollow: UserCommandHandler = async (cmdName: string, user: Us
 export const handleFollowing: UserCommandHandler = async (cmdName: string, user: User,  ...args: string[]) => {
 	const fullFeeds: FullFeedFollow[] = await selectAllFullFeedFollows(user.id)
 	console.log(fullFeeds)
+}
+
+export const handleUnfollow: UserCommandHandler = async (cmdName: string, user: User, ...args: string[]) => {
+	if (args.length < 1) {
+		throw new GuidedExit("error: the handleFollow expects one argument <url>");
+	}
+
+	const [url] = args;
+	const feed: FeedMini = await getFeedByUrl(url);
+	if (feed == undefined) {
+		throw new GuidedExit(`error: get FeedByUrl with url <${url}>`);
+	}
+	
+	const result = await deleteFeedFollow(user.id, feed.id)
+	console.log("succesfull deletion")
 }

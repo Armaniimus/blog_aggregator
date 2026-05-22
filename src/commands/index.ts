@@ -1,4 +1,4 @@
-import { CommandHandler, UserCommandHandler, handlerLogin, handlerRegister, handlerReset, handlerUsers, handleAggregator, handleAddFeed, handleFeeds, handleFollow, handleFollowing } from "./handlers";
+import { CommandHandler, UserCommandHandler, handlerLogin, handlerRegister, handlerReset, handlerUsers, handleAggregator, handleAddFeed, handleFeeds, handleFollow, handleFollowing, handleUnfollow } from "./handlers";
 import { readConfig } from "../config";
 import { selectUser } from "../lib/db/queries/user";
 import { GuidedExit } from "..";
@@ -31,6 +31,7 @@ export const initCommands = (): CommandsRegistry => {
 	registerCommand(commandRegistery, "feeds", handleFeeds);
 	registerCommand(commandRegistery, "follow", middlewareLoggedIn(handleFollow));
 	registerCommand(commandRegistery, "following", middlewareLoggedIn(handleFollowing));
+	registerCommand(commandRegistery, "unfollow", middlewareLoggedIn(handleUnfollow));
 	return commandRegistery;
 }
 
