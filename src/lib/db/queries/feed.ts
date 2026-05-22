@@ -17,3 +17,17 @@ export async function selectAllFeeds() {
 	
 	return result;
 }
+
+export async function getFeedByUrl(url: string) {
+	const [result] = await db.select({
+		id: feeds.id,
+		createdAt: feeds.createdAt,
+		updatedAt: feeds.updatedAt,		
+		name: feeds.name,
+		url: feeds.url,
+	}).from(feeds)
+	.where(eq(feeds.url, url))
+
+	return result;
+}
+

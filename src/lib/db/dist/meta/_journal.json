@@ -15,6 +15,13 @@
       "when": 1779233175711,
       "tag": "0001_wooden_terrax",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1779468687184,
+      "tag": "0002_nasty_selene",
+      "breakpoints": true
     }
   ]
 }

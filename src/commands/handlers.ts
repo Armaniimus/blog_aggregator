@@ -2,10 +2,12 @@ import { setUser, readConfig } from "../config";
 import { GuidedExit } from "../index.js";
 import { createUser, selectUser, deleteAllUsers, selectAllUsers} from "../lib/db/queries/user.js";
 import { fetchFeed } from "../../rss.js"; 
-import { insertFeed, selectAllFeeds } from "../lib/db/queries/feed.js";
-import { Feed, feeds, User } from "../lib/db/schema.js";
+import { insertFeed, selectAllFeeds, getFeedByUrl } from "../lib/db/queries/feed.js";
+import { selectFullFeedFollow, insertFeedFollows, selectAllFullFeedFollows } from "../lib/db/queries/feed_follows.js";
+import { Feed, FeedMini, feeds, User, FullFeedFollow, FeedFollows } from "../lib/db/schema.js";
 
 export type CommandHandler = (cmdName: string, ...args: string[]) => Promise<void>;
+export type UserCommandHandler = (cmdName: string, user: User, ...args: string[]) => Promise<void>;
 
 export const handlerLogin: CommandHandler = async (cmdName: string, ...args: string[]) => {
 	if (args.length == 0) {
@@ -44,14 +46,9 @@ export const handlerReset: CommandHandler = async (cmdName: string, ...args: str
 	}
 }
 
-export const handlerUsers: CommandHandler = async (cmdName: string, ...args: string[]) => {
+export const handlerUsers: UserCommandHandler = async (cmdName: string,  user: User, ...args: string[]) => {
 	try {
 		const config = readConfig()
-
-		if ((await selectUser(config.currentUserName)).length == 0) {
-			throw new GuidedExit("error: You first have to login for this endpoint!");
-		}
-
 		const users = await selectAllUsers();
 		
 		for (let i = 0; i< users.length; i++) {
@@ -69,22 +66,16 @@ export const handleAggregator: CommandHandler = async (cmdName: string, ...args:
 	console.log(result);
 }
 
-export const handleAddFeed: CommandHandler = async (cmdName: string, ...args: string[]) => {
+export const handleAddFeed: UserCommandHandler = async (cmdName: string, user: User, ...args: string[]) => {
 	if (args.length < 2) {
 		throw new GuidedExit("error: the handleAddFeed expects a two arguments, <name, url>");
 	}
 
 	const [name, url] = args;
-
-	const config = readConfig()
-	const user:User[] = await selectUser(config.currentUserName);
-	if (user.length == 0) {
-		throw new GuidedExit("error: You first have to login for this endpoint!");
-	}
-
-	const feed: Feed = await insertFeed(name, url, user[0].id);
-	
-	printFeed(user[0], feed)
+	const feed: Feed = await insertFeed(name, url, user.id);
+	const insert: FeedFollows = await insertFeedFollows(feed.id, user.id)
+	const fullFeed: FullFeedFollow = await selectFullFeedFollow(insert.id)
+	console.log(fullFeed)
 }
 
 export const handleFeeds: CommandHandler = async (cmdName: string, ...args: string[]) => {
@@ -92,7 +83,24 @@ export const handleFeeds: CommandHandler = async (cmdName: string, ...args: stri
 	console.log(result);
 }
 
-function printFeed(user: User, feed: Feed) {
-	console.log(user)
-	console.log(feed)
+export const handleFollow: UserCommandHandler = async (cmdName: string, user: User, ...args: string[]) => {
+	if (args.length < 1) {
+		throw new GuidedExit("error: the handleFollow expects one argument <url>");
+	}
+	const [url] = args;
+
+	const feed: FeedMini = await getFeedByUrl(url);
+	if (feed == undefined) {
+		throw new GuidedExit(`error: get FeedByUrl with url <${url}>`);
+	}
+
+	const insert: FeedFollows = await insertFeedFollows(feed.id, user.id)
+	const fullFeed: FullFeedFollow = await selectFullFeedFollow(insert.id)
+	
+	console.log(fullFeed)
+}
+
+export const handleFollowing: UserCommandHandler = async (cmdName: string, user: User,  ...args: string[]) => {
+	const fullFeeds: FullFeedFollow[] = await selectAllFullFeedFollows(user.id)
+	console.log(fullFeeds)
 }
