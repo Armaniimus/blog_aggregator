@@ -57,7 +57,7 @@ export const handlerUsers: UserCommandHandler = async (cmdName: string,  user: U
 		};
 
 	} catch (err) {
-		throw new GuidedExit("error: reset failed");
+		throw new GuidedExit("error: handlerUsers failed");
 	}
 }
 
